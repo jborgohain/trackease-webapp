@@ -1,12 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
-import clientPromise from '@/lib/mongodb';
+import { NextResponse } from 'next/server';
 import { ObjectId } from 'mongodb';
+import clientPromise from '@/lib/mongodb';
+import type { NextRequest } from 'next/server';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { trackerId: string } }
+  context: { params: { trackerId: string } }
 ) {
-  const trackerId = params.trackerId;
+  const { trackerId } = context.params;
 
   if (!trackerId) {
     return NextResponse.json({ message: 'Tracker ID is required' }, { status: 400 });
@@ -17,9 +18,8 @@ export async function GET(
     const db = client.db(process.env.MONGO_DB_NAME);
     const collection = db.collection('tracked_shipments');
 
-    // Check if the trackerId is a valid MongoDB ObjectId
     if (!ObjectId.isValid(trackerId)) {
-        return NextResponse.json({ message: 'Invalid Tracker ID format' }, { status: 400 });
+      return NextResponse.json({ message: 'Invalid Tracker ID format' }, { status: 400 });
     }
 
     const trackerDetails = await collection.aggregate([
@@ -34,7 +34,7 @@ export async function GET(
       },
       {
         $addFields: {
-          from_address: { $arrayElemAt: [ "$from_address_lookup", 0 ] }
+          from_address: { $arrayElemAt: ["$from_address_lookup", 0] }
         }
       },
       {
@@ -49,9 +49,7 @@ export async function GET(
       return NextResponse.json({ message: 'Tracker not found' }, { status: 404 });
     }
 
-    const tracker = trackerDetails[0];
-
-    return NextResponse.json(tracker, { status: 200 });
+    return NextResponse.json(trackerDetails[0], { status: 200 });
   } catch (error) {
     console.error('API Error:', error);
     return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
