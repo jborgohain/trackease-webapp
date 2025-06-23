@@ -1,13 +1,12 @@
-import { NextResponse } from 'next/server';
-import { ObjectId } from 'mongodb';
+import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
-import type { NextRequest } from 'next/server';
+import { ObjectId } from 'mongodb';
 
 export async function GET(
   request: NextRequest,
-  context: { params: { trackerId: string } }
+  context: { params: { trackerId: string } } // ✅ this line is OK
 ) {
-  const { trackerId } = context.params;
+  const trackerId = context.params.trackerId;
 
   if (!trackerId) {
     return NextResponse.json({ message: 'Tracker ID is required' }, { status: 400 });
