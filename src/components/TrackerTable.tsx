@@ -124,9 +124,9 @@ export default function TrackerTable() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tracking Code</th>
+                <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                 <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Carrier</th>
-                <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                 <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Destination</th>
                 <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
               </tr>
