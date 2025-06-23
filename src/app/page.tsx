@@ -22,7 +22,7 @@ export default function Home() {
             {/* <img src="/Track_easy_logo.png" alt="TrackEase Logo" className="h-8" /> */}
           </div>
           <div>
-            <p className="text-sm">&copy; 2024 TrackEase - a White Label Pharmacy internal to0l. All rights reserved.</p>
+            <p className="text-sm">&copy; 2024 TrackEase - a White Label Pharmacy internal tool. All rights reserved.</p>
           </div>
         </div>
       </footer>
