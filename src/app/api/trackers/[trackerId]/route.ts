@@ -4,7 +4,7 @@ import { ObjectId } from 'mongodb';
 
 export async function GET(
   request: NextRequest,
-  context: { params: { trackerId: string } } // ✅ this line is OK
+  context: { params: Record<string, string> } // ✅ this line is OK
 ) {
   const trackerId = context.params.trackerId;
 
