@@ -2,8 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
 
-export async function GET(request: NextRequest, context: { params: { trackerId: string } }) {
-  const trackerId = context.params.trackerId;
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { trackerId: string } }
+) {
+  const trackerId = params.trackerId;
 
   if (!trackerId) {
     return NextResponse.json({ message: 'Tracker ID is required' }, { status: 400 });
