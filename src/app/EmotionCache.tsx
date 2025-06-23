@@ -6,8 +6,8 @@ import { useServerInsertedHTML } from 'next/navigation';
 import { CacheProvider as EmotionCacheProvider } from '@emotion/react';
 
 export function NextAppDirEmotionCacheProvider(props: {
-  options: any;
-  CacheProvider?: any;
+  options: Omit<import('@emotion/cache').Options, 'insertionPoint'>;
+  CacheProvider?: React.ComponentType<{ value: import('@emotion/cache').EmotionCache; children: React.ReactNode }>;
   children: React.ReactNode;
 }) {
   const { options, CacheProvider = EmotionCacheProvider, children } = props;

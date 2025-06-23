@@ -46,7 +46,7 @@ export default function TrackerTable() {
         const data = await res.json();
         setTrackers(data.trackers);
         setTotalTrackers(data.totalTrackers);
-      } catch (err: any) {
+      } catch (err) {
         setError(err.message);
       } finally {
         setLoading(false);
