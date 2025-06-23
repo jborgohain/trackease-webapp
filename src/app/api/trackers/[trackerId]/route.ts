@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ObjectId } from 'mongodb';
 import clientPromise from '@/lib/mongodb';
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+import { ObjectId } from 'mongodb';
+
 export async function GET(
   request: NextRequest,
-  
-  context: any
+  context: { params: { trackerId: string } } // ✅ this line is OK
 ) {
   const trackerId = context.params.trackerId;
 
@@ -34,7 +33,7 @@ export async function GET(
       },
       {
         $addFields: {
-          from_address: { $arrayElemAt: ['$from_address_lookup', 0] }
+          from_address: { $arrayElemAt: ["$from_address_lookup", 0] }
         }
       },
       {
