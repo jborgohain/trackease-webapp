@@ -9,6 +9,9 @@ export async function GET(request: NextRequest) {
     const query = searchParams.get('query');
     const status = searchParams.get('status');
     const carrier = searchParams.get('carrier');
+    const page = parseInt(searchParams.get('page') || '1', 10);
+    const limit = parseInt(searchParams.get('limit') || '20', 10);
+    const skip = (page - 1) * limit;
 
     let dbQuery: any = { $and: [] };
 
@@ -37,10 +40,13 @@ export async function GET(request: NextRequest) {
       .collection('tracked_shipments')
       .find(dbQuery)
       .sort({ 'easypost_created_at': -1 })
-      .limit(20)
+      .skip(skip)
+      .limit(limit)
       .toArray();
 
-    return NextResponse.json(trackers);
+    const totalTrackers = await db.collection('tracked_shipments').countDocuments(dbQuery);
+
+    return NextResponse.json({ trackers, totalTrackers });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ message: 'Failed to fetch trackers.' }, { status: 500 });

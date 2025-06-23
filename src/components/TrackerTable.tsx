@@ -24,6 +24,9 @@ export default function TrackerTable() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [carrierFilter, setCarrierFilter] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalTrackers, setTotalTrackers] = useState(0);
+  const trackersPerPage = 20;
 
   useEffect(() => {
     async function fetchTrackers() {
@@ -33,13 +36,16 @@ export default function TrackerTable() {
         if (searchQuery) params.append('query', searchQuery);
         if (statusFilter) params.append('status', statusFilter);
         if (carrierFilter) params.append('carrier', carrierFilter);
+        params.append('page', currentPage.toString());
+        params.append('limit', trackersPerPage.toString());
 
         const res = await fetch(`/api/trackers?${params.toString()}`);
         if (!res.ok) {
           throw new Error('Failed to fetch trackers');
         }
         const data = await res.json();
-        setTrackers(data);
+        setTrackers(data.trackers);
+        setTotalTrackers(data.totalTrackers);
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -52,7 +58,7 @@ export default function TrackerTable() {
     }, 500);
 
     return () => clearTimeout(debounceFetch);
-  }, [searchQuery, statusFilter, carrierFilter]);
+  }, [searchQuery, statusFilter, carrierFilter, currentPage]);
 
   const handleRowClick = (trackerId: string) => {
     router.push(`/trackers/${trackerId}`);
@@ -71,6 +77,8 @@ export default function TrackerTable() {
         return <span className={`${baseClasses} bg-green-200 text-green-800`}>Delivered</span>;
       case 'failure':
         return <span className={`${baseClasses} bg-red-200 text-red-800`}>Failure</span>;
+        case 'cancelled':
+          return <span className={`${baseClasses} bg-red-200 text-red-800`}>Cancelled</span>;
       default:
         return <span className={`${baseClasses} bg-gray-200 text-gray-800`}>Unknown</span>;
     }
@@ -97,6 +105,7 @@ export default function TrackerTable() {
           <option value="out_for_delivery">Out for Delivery</option>
           <option value="delivered">Delivered</option>
           <option value="failure">Failure</option>
+          <option value="cancelled">Cancelled</option>
           <option value="unknown">Unknown</option>
         </select>
         <select
@@ -120,6 +129,11 @@ export default function TrackerTable() {
         </div>
       ) : (
         <div className="overflow-x-auto">
+          <div className="flex justify-end items-center mb-4">
+            <span className="text-sm text-gray-600">
+              Showing {Math.min((currentPage - 1) * trackersPerPage + 1, totalTrackers)} - {Math.min(currentPage * trackersPerPage, totalTrackers)} of {totalTrackers}
+            </span>
+          </div>
           <table className="min-w-full bg-white">
             <thead className="bg-gray-50">
               <tr>
@@ -144,6 +158,23 @@ export default function TrackerTable() {
               ))}
             </tbody>
           </table>
+          <div className="flex justify-between items-center mt-4">
+            <button 
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+            >
+              Previous
+            </button>
+            <span className="text-sm text-gray-700">Page {currentPage} of {Math.ceil(totalTrackers / trackersPerPage)}</span>
+            <button 
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(totalTrackers / trackersPerPage)))}
+              disabled={currentPage === Math.ceil(totalTrackers / trackersPerPage)}
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+            >
+              Next
+            </button>
+          </div>
         </div>
       )}
     </div>

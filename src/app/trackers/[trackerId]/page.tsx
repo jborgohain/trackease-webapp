@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import Link from 'next/link';
 
 interface TrackingDetail {
   message: string;
@@ -87,9 +88,14 @@ export default function TrackerDetailPage() {
   if (!tracker) return <div className="p-4">Tracker not found.</div>;
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Shipment Details</h1>
-      <div className="bg-white shadow-md rounded-lg p-6">
+    <div className="bg-gray-50 container mx-auto p-4">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold">Shipment Details</h1>
+        <Link href="/" className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+          Back to Home
+        </Link>
+      </div>
+      <div className="bg-white shadow-lg rounded-lg p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div>
             <h2 className="text-lg font-semibold">{tracker.tracking_code}</h2>
@@ -97,9 +103,13 @@ export default function TrackerDetailPage() {
             <p className="text-sm text-gray-600">Status: <span className="font-medium text-blue-600">{tracker.current_status}</span></p>
           </div>
           <div className="text-right">
-            <a href={tracker.public_tracking_url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">View on EasyPost</a>
+            <a href={tracker.public_tracking_url} target="_blank" rel="noopener noreferrer" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+              Track the package
+            </a>
             {tracker.postage_label_url && (
-              <a href={tracker.postage_label_url} target="_blank" rel="noopener noreferrer" className="ml-4 text-blue-500 hover:underline">View Postage Label</a>
+              <a href={tracker.postage_label_url} target="_blank" rel="noopener noreferrer" className="ml-4 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                View Postage Label
+              </a>
             )}
           </div>
         </div>
