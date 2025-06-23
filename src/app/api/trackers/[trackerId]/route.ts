@@ -4,9 +4,9 @@ import clientPromise from '@/lib/mongodb';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { trackerId: string } }
+  context: any
 ) {
-  const trackerId = params.trackerId;
+  const trackerId = context.params.trackerId;
 
   if (!trackerId) {
     return NextResponse.json({ message: 'Tracker ID is required' }, { status: 400 });
