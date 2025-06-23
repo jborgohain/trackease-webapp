@@ -6,9 +6,10 @@ import { useRouter } from 'next/navigation';
 interface Tracker {
   _id: string;
   tracking_code: string;
-  status: string;
+  current_status: string;
   carrier: string;
   to_address: {
+    name: string;
     city: string;
     state: string;
   };
@@ -57,20 +58,38 @@ export default function TrackerTable() {
     router.push(`/trackers/${trackerId}`);
   };
 
+  const getStatusChip = (status: string) => {
+    const baseClasses = 'px-2 py-1 text-xs font-semibold rounded-full';
+    switch (status) {
+      case 'pre_transit':
+        return <span className={`${baseClasses} bg-gray-200 text-gray-800`}>Pre-Transit</span>;
+      case 'in_transit':
+        return <span className={`${baseClasses} bg-blue-200 text-blue-800`}>In-Transit</span>;
+      case 'out_for_delivery':
+        return <span className={`${baseClasses} bg-yellow-200 text-yellow-800`}>Out for Delivery</span>;
+      case 'delivered':
+        return <span className={`${baseClasses} bg-green-200 text-green-800`}>Delivered</span>;
+      case 'failure':
+        return <span className={`${baseClasses} bg-red-200 text-red-800`}>Failure</span>;
+      default:
+        return <span className={`${baseClasses} bg-gray-200 text-gray-800`}>Unknown</span>;
+    }
+  };
+
   return (
-    <div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+    <div className="bg-white shadow-md rounded-lg p-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <input
           type="text"
           placeholder="Search by tracking code or name..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full p-2 border rounded md:col-span-1"
+          className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         />
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="w-full p-2 border rounded"
+          className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         >
           <option value="">All Statuses</option>
           <option value="pre_transit">Pre-Transit</option>
@@ -83,7 +102,7 @@ export default function TrackerTable() {
         <select
           value={carrierFilter}
           onChange={(e) => setCarrierFilter(e.target.value)}
-          className="w-full p-2 border rounded"
+          className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         >
           <option value="">All Carriers</option>
           <option value="USPS">USPS</option>
@@ -92,29 +111,35 @@ export default function TrackerTable() {
         </select>
       </div>
       {loading ? (
-        <p>Loading...</p>
+        <div className="flex justify-center items-center p-8">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        </div>
       ) : error ? (
-        <p>Error: {error}</p>
+        <div className="text-center p-8 text-red-500 bg-red-50 rounded-md">
+            <p className="font-semibold">Error: {error}</p>
+        </div>
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white">
-            <thead>
+            <thead className="bg-gray-50">
               <tr>
-                <th className="py-2 px-4 border-b">Tracking Code</th>
-                <th className="py-2 px-4 border-b">Status</th>
-                <th className="py-2 px-4 border-b">Carrier</th>
-                <th className="py-2 px-4 border-b">Destination</th>
-                <th className="py-2 px-4 border-b">Created At</th>
+                <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tracking Code</th>
+                <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Carrier</th>
+                <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Destination</th>
+                <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-gray-200">
               {trackers.map((tracker) => (
-                <tr key={tracker._id} onClick={() => handleRowClick(tracker._id)} className="hover:bg-gray-100 cursor-pointer">
-                  <td className="py-2 px-4 border-b text-blue-600 hover:underline">{tracker.tracking_code}</td>
-                  <td className="py-2 px-4 border-b">{tracker.current_status}</td>
-                  <td className="py-2 px-4 border-b">{tracker.carrier}</td>
-                  <td className="py-2 px-4 border-b">{tracker.to_address.city}, {tracker.to_address.state}</td>
-                  <td className="py-2 px-4 border-b">{new Date(tracker.easypost_created_at).toLocaleDateString()}</td>
+                <tr key={tracker._id} onClick={() => handleRowClick(tracker._id)} className="hover:bg-gray-50 cursor-pointer">
+                  <td className="py-4 px-4 whitespace-nowrap text-sm font-medium text-blue-600 hover:underline">{tracker.tracking_code}</td>
+                  <td className="py-4 px-4 whitespace-nowrap text-sm text-gray-500">{tracker.to_address.name}</td>
+                  <td className="py-4 px-4 whitespace-nowrap text-sm">{getStatusChip(tracker.current_status)}</td>
+                  <td className="py-4 px-4 whitespace-nowrap text-sm text-gray-500">{tracker.carrier}</td>
+                  <td className="py-4 px-4 whitespace-nowrap text-sm text-gray-500">{tracker.to_address.city}, {tracker.to_address.state}</td>
+                  <td className="py-4 px-4 whitespace-nowrap text-sm text-gray-500">{new Date(tracker.easypost_created_at).toLocaleDateString()}</td>
                 </tr>
               ))}
             </tbody>
