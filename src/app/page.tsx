@@ -5,7 +5,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       <header className="bg-gray-900 text-white shadow-md">
-        <div className="container mx-auto px-4 py-6">
+        <div className="container mx-auto px-4 py-4">
           <div className="flex items-center">
             <Image src="/Track_easy_logo.png" alt="TrackEase Logo" width={100} height={5} className="mr-4" />
             <h1 className="text-3xl font-bold">TrackEase</h1>
