@@ -7,6 +7,7 @@ import Link from 'next/link';
 interface TrackingDetail {
   message: string;
   current_status: string;
+  status: string;
   datetime: string;
   source: string;
   location?: {

@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import TrackerTable from '@/components/TrackerTable';
 
 export default function Home() {
@@ -6,7 +7,7 @@ export default function Home() {
       <header className="bg-gray-900 text-white shadow-md">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center">
-            <img src="/Track_easy_logo.png" alt="TrackEase Logo" className="h-12 mr-4" />
+            <Image src="/Track_easy_logo.png" alt="TrackEase Logo" width={200} height={48} className="mr-4" />
             <h1 className="text-3xl font-bold">TrackEase</h1>
           </div>
         </div>

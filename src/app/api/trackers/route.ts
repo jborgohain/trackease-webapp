@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
+import { Filter, Document } from 'mongodb';
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,10 +14,10 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '20', 10);
     const skip = (page - 1) * limit;
 
-    let dbQuery: any = { $and: [] };
+    const conditions: Filter<Document>[] = [];
 
     if (query) {
-      dbQuery.$and.push({
+      conditions.push({
         $or: [
           { tracking_code: { $regex: query, $options: 'i' } },
           { 'to_address.name': { $regex: query, $options: 'i' } },
@@ -25,16 +26,14 @@ export async function GET(request: NextRequest) {
     }
 
     if (status) {
-      dbQuery.$and.push({ current_status: status });
+      conditions.push({ current_status: status });
     }
 
     if (carrier) {
-      dbQuery.$and.push({ carrier: carrier });
+      conditions.push({ carrier: carrier });
     }
 
-    if (dbQuery.$and.length === 0) {
-      dbQuery = {};
-    }
+    const dbQuery: Filter<Document> = conditions.length > 0 ? { $and: conditions } : {};
 
     const trackers = await db
       .collection('tracked_shipments')
