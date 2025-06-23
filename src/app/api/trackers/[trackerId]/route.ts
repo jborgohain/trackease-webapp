@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import clientPromise from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
+import clientPromise from '@/lib/mongodb';
 
 export async function GET(
   request: NextRequest,
-  context: { params: Record<string, string> } // ✅ this line is OK
+  { params }: { params: { trackerId: string } }
 ) {
-  const trackerId = context.params.trackerId;
+  const trackerId = params.trackerId;
 
   if (!trackerId) {
     return NextResponse.json({ message: 'Tracker ID is required' }, { status: 400 });
@@ -33,7 +33,7 @@ export async function GET(
       },
       {
         $addFields: {
-          from_address: { $arrayElemAt: ["$from_address_lookup", 0] }
+          from_address: { $arrayElemAt: ['$from_address_lookup', 0] }
         }
       },
       {
