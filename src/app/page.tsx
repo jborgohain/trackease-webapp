@@ -13,7 +13,7 @@ export default function Home() {
       </header>
       <main className="flex-grow container mx-auto px-4 py-8">
         <h1 className="text-4xl font-bold text-gray-800 mb-6">Shipment Tracker</h1>
-        <p className="text-lg text-gray-600 mb-8">Track all your shipments in one place. Get real-time updates and manage your deliveries with ease.</p>
+        <p className="text-lg text-gray-600 mb-8">Track all your White Label Pharmacy shipments in one place. Get real-time updates and manage your deliveries with ease.</p>
         <TrackerTable />
       </main>
       <footer className="bg-gray-800 text-white py-4 mt-auto">
