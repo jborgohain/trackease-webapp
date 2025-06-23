@@ -111,7 +111,7 @@ export default function TrackerTable() {
               {trackers.map((tracker) => (
                 <tr key={tracker._id} onClick={() => handleRowClick(tracker._id)} className="hover:bg-gray-100 cursor-pointer">
                   <td className="py-2 px-4 border-b text-blue-600 hover:underline">{tracker.tracking_code}</td>
-                  <td className="py-2 px-4 border-b">{tracker.status}</td>
+                  <td className="py-2 px-4 border-b">{tracker.current_status}</td>
                   <td className="py-2 px-4 border-b">{tracker.carrier}</td>
                   <td className="py-2 px-4 border-b">{tracker.to_address.city}, {tracker.to_address.state}</td>
                   <td className="py-2 px-4 border-b">{new Date(tracker.easypost_created_at).toLocaleDateString()}</td>
