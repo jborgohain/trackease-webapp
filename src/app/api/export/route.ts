@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
+import * as XLSX from 'xlsx';
 import { Filter, Document } from 'mongodb';
 
 export async function GET(request: NextRequest) {
@@ -12,9 +13,6 @@ export async function GET(request: NextRequest) {
     const carrier = searchParams.get('carrier');
     const startDate = searchParams.get('startDate');
     const endDate = searchParams.get('endDate');
-    const page = parseInt(searchParams.get('page') || '1', 10);
-    const limit = parseInt(searchParams.get('limit') || '20', 10);
-    const skip = (page - 1) * limit;
 
     const conditions: Filter<Document>[] = [];
 
@@ -54,15 +52,39 @@ export async function GET(request: NextRequest) {
       .collection('tracked_shipments')
       .find(dbQuery)
       .sort({ 'easypost_created_at': -1 })
-      .skip(skip)
-      .limit(limit)
       .toArray();
 
-    const totalTrackers = await db.collection('tracked_shipments').countDocuments(dbQuery);
+    const dataToExport = trackers.map(tracker => ({
+      'Tracking Code': tracker.tracking_code,
+      'Name': tracker.to_address.name,
+      'Status': tracker.current_status,
+      'Carrier': tracker.carrier,
+      'Destination': `${tracker.to_address.city}, ${tracker.to_address.state}`,
+      'Created At': new Date(tracker.easypost_created_at).toLocaleDateString("en-US", { timeZone: "UTC" }),
+      'Phone': tracker.to_address.phone,
+      'Email': tracker.to_address.email,
+      'Address': `${tracker.to_address.street1}, ${tracker.to_address.city}, ${tracker.to_address.state} ${tracker.to_address.zip}`
+    }));
 
-    return NextResponse.json({ trackers, totalTrackers });
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Trackers');
+    const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+
+    return new NextResponse(buffer, {
+      status: 200,
+      headers: {
+        // 'Content-Disposition': 'attachment; filename="trackers.xlsx"',
+        'Content-Disposition': `attachment; filename="Exported_shipment_details_list_${new Date()
+          .toISOString()
+          .slice(0, 16)      // "2025-08-16T09:30"
+          .replace("T", "_") // -> "2025-08-16_09:30"
+          .replace(/:/g, "-")}.xlsx"`,
+        'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      },
+    });
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ message: 'Failed to fetch trackers.' }, { status: 500 });
+    return NextResponse.json({ message: 'Failed to export trackers.' }, { status: 500 });
   }
 }
