@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (startDate || endDate) {
-        const dateFilter: any = {};
+        const dateFilter: { $gte?: Date; $lte?: Date } = {};
         if (startDate) {
             dateFilter.$gte = new Date(startDate);
         }
